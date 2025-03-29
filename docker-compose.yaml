@@ -4,7 +4,7 @@ services:
   bot:
     build: .
     environment:
-      - MM_TOKEN=nujq3dbhr78z8c1r49a4c1bt1r
+      - MM_TOKEN=foo46iqpj7nifppk4p3j43s3ny
       - MM_URL=http://mattermost:8065
       - TARANTOOL_ADDR=tarantool:3301
     ports:
@@ -13,6 +13,8 @@ services:
       - tarantool
       - mattermost
     restart: unless-stopped
+    volumes:
+      - .:/app
 
   tarantool:
     image: tarantool/tarantool:2
@@ -29,10 +31,13 @@ services:
       - "8065:8065"
     environment:
       - MM_SQLSETTINGS_DRIVERNAME=postgres
+      - MM_SERVICESETTINGS_ALLOWEDUNTRUSTEDINTERNALCONNECTIONS=localhost,127.0.0.1,::1,bot
       - MM_SQLSETTINGS_DATASOURCE=postgres://mmuser:mmuser_password@postgres:5432/mattermost?sslmode=disable
     depends_on:
       - postgres
     restart: unless-stopped
+    volumes:
+      - mattermost_data:/mattermost
 
   postgres:
     image: postgres:13
@@ -43,15 +48,9 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
-  nginx:
-    image: nginx:alpine
-    ports:
-      - "8080:80"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
-    depends_on:
-      - bot
+ 
 
 volumes:
   postgres_data:
+  mattermost_data:
 

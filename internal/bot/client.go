@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"os"
 	"strings"
 
@@ -53,6 +54,7 @@ func (mc *MattermostClient) Listen(bot *Bot) {
 	defer mc.ws.Close()
 
 	for event := range mc.ws.EventChannel {
+		log.Printf("event : %v", event)
 		if event.EventType() == model.WebsocketEventPosted {
 			mc.handlePostEvent(event, bot)
 		}
